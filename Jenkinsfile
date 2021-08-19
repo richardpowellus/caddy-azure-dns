@@ -1,10 +1,14 @@
 pipeline {
+  agent any
+  
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
+  
   environment {
     DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
   }
+  
   stages {
     stage('Initialize') {
       def dockerHome = tool 'myDocker'
@@ -26,6 +30,7 @@ pipeline {
       }
     }
   }
+  
   post {
     always {
       sh 'docker logout'
