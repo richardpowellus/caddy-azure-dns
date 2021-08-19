@@ -32,7 +32,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/caddy-azure-dns:latest
+          tags: ${{ secrets.DOCKER_USER }}/caddy-azure-dns:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
