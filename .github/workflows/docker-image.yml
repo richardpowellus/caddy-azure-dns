@@ -21,7 +21,7 @@ jobs:
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
     - name: Build the docker image
-      run: docker build . --file Dockerfile --tag caddy-azure-dns:latest
+      run: docker build . --file Dockerfile --tag latest
 
     - name: Push image to Docker Hub
       run: docker push ${{secrets.DOCKER_USER}}/caddy-azure-dns:latest
