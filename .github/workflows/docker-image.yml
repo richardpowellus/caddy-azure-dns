@@ -24,4 +24,4 @@ jobs:
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
     - name: Push image to Docker Hub
-      run: docker push ${{secrets.DOCKER_USER}}/caddy-azure-dns
+      run: docker push ${{secrets.DOCKER_USER}}/caddy-azure-dns:latest
