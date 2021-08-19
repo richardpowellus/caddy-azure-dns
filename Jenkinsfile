@@ -1,5 +1,4 @@
 pipeline {
-  agent { label 'linux' }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
@@ -7,6 +6,10 @@ pipeline {
     DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
   }
   stages {
+    stage('Initialize') {
+      def dockerHome = tool 'myDocker'
+      env.PATH = "${dockerHome}/bin:${env.PATH}"
+    }
     stage('Build') {
       steps {
         sh 'docker build -t dprus/caddy-azure-dns:latest .'
