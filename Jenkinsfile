@@ -6,8 +6,8 @@ pipeline {
   }
   
   environment {
-    DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
-    REBUILD_IMAGE = false
+    def DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
+    def REBUILD_IMAGE = false
   }
   
   stages {
@@ -16,10 +16,10 @@ pipeline {
       steps {
         script {
           try {
-            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = params.CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
+            def CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = params.CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
           } catch (Exception e) {
             echo("Could not read CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST from parameters. Assuming this is the first run of the pipeline. Exception: ${e}")
-            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = ""
+            def CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = ""
           }
         }
       }
@@ -28,7 +28,7 @@ pipeline {
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
         script {
-          NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
+          def NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
             script: '''
               docker manifest inspect caddy:builder -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
             ''',
@@ -67,6 +67,12 @@ pipeline {
           }
         }
       }
+    }
+    
+    if (REBUILD_IMAGE = false) {
+      echo("No reason to build the image. Exiting early.")
+      currentBuild.result = 'SUCCESS'
+      return
     }
     
     stage('Build') {
