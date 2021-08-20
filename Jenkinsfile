@@ -15,10 +15,10 @@ pipeline {
       steps {
         script {
           try {
-            currentUpstreamDockerHubImageDigest = params.currentUpstreamDockerHubImageDigest
+            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = params.CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
           } catch (Exception e) {
-            echo("Could not read currentUpstreamDockerHubImageDigest from parameters. Assuming this is the first run of the pipeline. Exception: ${e}")
-            currentUpstreamDockerHubImageDigest = ""
+            echo("Could not read CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST from parameters. Assuming this is the first run of the pipeline. Exception: ${e}")
+            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = ""
           }
         }
       }
@@ -26,7 +26,10 @@ pipeline {
     
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
-        
+        NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
+          script: 'docker manifest inspect caddy:builder -v | jq ".[].Descriptor | select (.platform.architecture==\"amd64\" and .platform.os==\"linux\")" | jq -r ".digest"'
+          returnStdout: true 
+        ).trim()
       }
     }
     
@@ -53,9 +56,9 @@ pipeline {
         script {
           properties([
             parameters([
-              string(defaultValue: "${currentUpstreamDockerHubImageDigest}",
+              string(defaultValue: "${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}",
                      description: "Current Upstream DockerHub Image Digest",
-                     name: 'currentUpstreamDockerHubImageDigest',
+                     name: 'CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST',
                      trim: true)
             ])
           ])
