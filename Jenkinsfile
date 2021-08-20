@@ -6,8 +6,8 @@ pipeline {
   }
   
   environment {
-    def DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
-    def REBUILD_IMAGE = false
+    DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
+    REBUILD_IMAGE = false
   }
   
   stages {
@@ -16,10 +16,10 @@ pipeline {
       steps {
         script {
           try {
-            def CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = params.CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
+            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = params.CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
           } catch (Exception e) {
             echo("Could not read CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST from parameters. Assuming this is the first run of the pipeline. Exception: ${e}")
-            def CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = ""
+            CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = ""
           }
         }
       }
@@ -34,7 +34,7 @@ pipeline {
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
         script {
-          def NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
+          NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
             script: '''
               docker manifest inspect caddy:builder -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
             ''',
@@ -55,7 +55,7 @@ pipeline {
     stage('Determine if it has been more than 2 weeks since the latest build') {
       steps {
         script {
-          def SECONDS_SINCE_LAST_IMAGE = sh(
+          SECONDS_SINCE_LAST_IMAGE = sh(
             script: '''
               d1=$(curl -s GET https://hub.docker.com/v2/repositories/dprus/caddy-azure-dns/tags/latest | jq -r ".last_updated")
               ddiff=$(( $(date "+%s") - $(date -d "$d1" "+%s") ))
@@ -63,7 +63,7 @@ pipeline {
             ''',
             returnStdout: true
           ).trim()
-          def SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
+          SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
           echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
           if (SECONDS_SINCE_LAST_IMAGE_INT > 1209600) { // 1209600 is 2 weeks in seconds
             echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
