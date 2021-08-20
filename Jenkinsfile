@@ -69,7 +69,7 @@ pipeline {
       }
     }
     
-    if (REBUILD_IMAGE = false) {
+    if (REBUILD_IMAGE == false) {
       echo("No reason to build the image. Exiting early.")
       currentBuild.result = 'SUCCESS'
       return
