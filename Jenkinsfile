@@ -14,7 +14,7 @@ pipeline {
     REBUILD_IMAGE = false
     UPSTREAM_IMAGE_NAME = "caddy:builder"
     DOCKERHUB_USERNAME = "dprus"
-    DOCKERHUB_REPO_NAKE = "caddy-azure-dns"
+    DOCKERHUB_REPO_NAME = "caddy-azure-dns"
     DOCKERHUB_REPO_TAG = "latest"
   }
   
