@@ -79,6 +79,7 @@ pipeline {
       steps {
         script {
           if (REBUILD_IMAGE == false) {
+            echo("Image will not be rebuilt. This is still a success. Exiting.")
             currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
             sleep(1)   // Interrupt is not blocking and does not take effect immediately.
           }
