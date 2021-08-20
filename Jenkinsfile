@@ -34,6 +34,14 @@ pipeline {
             ''',
             returnStdout: true
           ).trim()
+          echo("CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+          echo("NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+          if (CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST != NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST) {
+            echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
+            REBUILD_IMAGE = true
+          } else {
+            echo("Upstream Docker Hub image digests are not equal. This will not cause an image rebuild.")
+          }
         }
       }
     }
@@ -50,8 +58,10 @@ pipeline {
             returnStdout: true
           ).trim()
           if (TIME_SINCE_LAST_IMAGE > 1209600) { // 1209600 is 2 weeks in seconds
-            echo "It has been more than 2 weeks since the last build. Image will be rebuilt."
+            echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
             REBUILD_IMAGE = true
+          } else {
+            echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
           }
         }
       }
