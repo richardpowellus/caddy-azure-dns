@@ -78,6 +78,7 @@ pipeline {
     stage("Determine if we should actually build the image.") {
       steps {
         script {
+          echo("REBUILD_IMAGE: '${REBUILD_IMAGE}'")
           if (REBUILD_IMAGE == false) {
             echo("Image will not be rebuilt. This is still a success. Exiting.")
             currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
