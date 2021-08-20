@@ -34,6 +34,7 @@ pipeline {
             returnStdout: true
           ).trim()
         }
+        echo NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
       }
     }
     
