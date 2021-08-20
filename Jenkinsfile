@@ -34,7 +34,6 @@ pipeline {
             returnStdout: true
           ).trim()
         }
-        echo NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST
       }
     }
     
@@ -61,7 +60,7 @@ pipeline {
         script {
           properties([
             parameters([
-              string(defaultValue: "${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}",
+              string(defaultValue: "${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}",
                      description: "Current Upstream DockerHub Image Digest",
                      name: 'CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST',
                      trim: true)
