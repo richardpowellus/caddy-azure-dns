@@ -28,7 +28,7 @@ pipeline {
       steps {
         script {
           NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
-            '''
+            script: '''
               docker manifest inspect caddy:builder -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
             ''',
             returnStdout: true
