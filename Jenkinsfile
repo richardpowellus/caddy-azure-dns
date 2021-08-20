@@ -49,7 +49,7 @@ pipeline {
     stage('Determine if it has been more than 2 weeks since the latest build') {
       steps {
         script {
-          SECONDS_SINCE_LAST_IMAGE = sh(
+          def SECONDS_SINCE_LAST_IMAGE = sh(
             script: '''
               d1=$(curl -s GET https://hub.docker.com/v2/repositories/dprus/caddy-azure-dns/tags/latest | jq -r ".last_updated")
               ddiff=$(( $(date "+%s") - $(date -d "$d1" "+%s") ))
@@ -59,12 +59,12 @@ pipeline {
           ).trim()
           def SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
           echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
-          //if (TIME_SINCE_LAST_IMAGE > 1209600) { // 1209600 is 2 weeks in seconds
-          //  echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
-          //  REBUILD_IMAGE = true
-          //} else {
-          //  echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
-          //}
+          if (SECONDS_SINCE_LAST_IMAGE_INT > 1209600) { // 1209600 is 2 weeks in seconds
+            echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
+            REBUILD_IMAGE = true
+          } else {
+            echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
+          }
         }
       }
     }
