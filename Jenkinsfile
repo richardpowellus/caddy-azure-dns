@@ -69,10 +69,13 @@ pipeline {
       }
     }
     
-    if (REBUILD_IMAGE == false) {
-      echo("No reason to build the image. Exiting early.")
-      currentBuild.result = 'SUCCESS'
-      return
+    stage("Determine if we should actually build the image.") {
+      if (REBUILD_IMAGE == false) {
+        script {
+          currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
+          sleep(1)   // Interrupt is not blocking and does not take effect immediately.
+        }
+      }
     }
     
     stage('Build') {
