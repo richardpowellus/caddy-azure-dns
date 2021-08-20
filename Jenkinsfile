@@ -71,8 +71,8 @@ pipeline {
     
     stage("Determine if we should actually build the image.") {
       steps {
-        if (REBUILD_IMAGE == false) {
-          script {
+        script {
+          if (REBUILD_IMAGE == false) {
             currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
             sleep(1)   // Interrupt is not blocking and does not take effect immediately.
           }
