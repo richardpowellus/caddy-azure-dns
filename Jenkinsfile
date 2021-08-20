@@ -25,6 +25,12 @@ pipeline {
       }
     }
     
+    stage('Login to Docker Hub') {
+      steps {
+        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+      }
+    }
+    
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
         script {
@@ -85,13 +91,7 @@ pipeline {
         sh 'docker build -t dprus/caddy-azure-dns:latest .'
       }
     }
-    
-    stage('Login to Docker Hub') {
-      steps {
-        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-      }
-    }
-    
+       
     stage('Push image to Docker Hub') {
       steps {
         sh 'docker push dprus/caddy-azure-dns:latest'
