@@ -56,23 +56,19 @@ pipeline {
     stage("Fetch new Upstream Docker Hub Image Digest") {
       steps {
         script {
-          if (REBUILD_IMAGE == false) {
-            NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
-              script: '''
-                docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
-              ''',
-              returnStdout: true
-            ).trim()
-            echo("CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
-            echo("NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
-            if (CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST != NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST) {
-              echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
-              REBUILD_IMAGE = true
-            } else {
-              echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
-            }
+          NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
+            script: '''
+              docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
+            ''',
+            returnStdout: true
+          ).trim()
+          echo("CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+          echo("NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+          if (CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST != NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST) {
+            echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
+            REBUILD_IMAGE = true
           } else {
-            echo("Image is already marked for build. Skipping this stage.")
+            echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
           }
         }
       }
