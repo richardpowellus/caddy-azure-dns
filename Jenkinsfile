@@ -39,46 +39,62 @@ pipeline {
       }
     }
     
+    if(currentBuild.changeSets.size() > 0) {
+      echo("There are changes in the git repository since the last build. Image will be rebuilt.")
+      REBUILD_IMAGE = true
+    }
+    else {
+      echo("There are NO changes in the git repository since the last build. This will not trigger an image rebuild.")
+    }
+    
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
-        script {
-          NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
-            script: '''
-              docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
-            ''',
-            returnStdout: true
-          ).trim()
-          echo("CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
-          echo("NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
-          if (CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST != NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST) {
-            echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
-            REBUILD_IMAGE = true
-          } else {
-            echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
+        if (REBUILD_IMAGE = false) {
+          script {
+            NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
+              script: '''
+                docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
+              ''',
+              returnStdout: true
+            ).trim()
+            echo("CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+            echo("NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST: '${NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST}'")
+            if (CURRENT_UPSTREAM_DOCKERHUB_IMAGE_DIGEST != NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST) {
+              echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
+              REBUILD_IMAGE = true
+            } else {
+              echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
+            }
           }
+        } else {
+          echo("Image is already marked for build. Skipping this stage.")
         }
       }
     }
     
     stage('Determine if it has been more than 2 weeks since the latest build') {
       steps {
-        script {
-          SECONDS_SINCE_LAST_IMAGE = sh(
-            script: '''
-              d1=$(curl -s GET https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}/tags/${DOCKERHUB_REPO_TAG} | jq -r ".last_updated")
-              ddiff=$(( $(date "+%s") - $(date -d "$d1" "+%s") ))
-              echo $ddiff
-            ''',
-            returnStdout: true
-          ).trim()
-          SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
-          echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
-          if (SECONDS_SINCE_LAST_IMAGE_INT > 1209600) { // 1209600 is 2 weeks in seconds
-            echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
-            REBUILD_IMAGE = true
-          } else {
-            echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
+        if (REBUILD_IMAGE = false) {
+          script {
+           SECONDS_SINCE_LAST_IMAGE = sh(
+              script: '''
+                d1=$(curl -s GET https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}/tags/${DOCKERHUB_REPO_TAG} | jq -r ".last_updated")
+                ddiff=$(( $(date "+%s") - $(date -d "$d1" "+%s") ))
+                echo $ddiff
+              ''',
+              returnStdout: true
+            ).trim()
+            SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
+            echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
+            if (SECONDS_SINCE_LAST_IMAGE_INT > 1209600) { // 1209600 is 2 weeks in seconds
+              echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
+              REBUILD_IMAGE = true
+            } else {
+              echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
+            }
           }
+        } else {
+          echo("Image is already marked for build. Skipping this stage.")
         }
       }
     }
