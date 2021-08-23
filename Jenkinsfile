@@ -10,7 +10,7 @@ pipeline {
   }
   
   environment {
-    DOCKERHUB_CREDENTIALS = credentials('dprus-dockerhub')
+    DOCKERHUB_CREDENTIALS = credentials("dprus-dockerhub")
     REBUILD_IMAGE = false
     UPSTREAM_IMAGE_NAME = "caddy:builder"
     DOCKERHUB_USERNAME = "dprus"
@@ -20,7 +20,7 @@ pipeline {
   
   stages {
     
-    stage('Initialize Variables') {
+    stage("Initialize Variables") {
       steps {
         script {
           try {
@@ -53,7 +53,7 @@ pipeline {
       }
     }
     
-    stage('Fetch new Upstream Docker Hub Image Digest') {
+    stage("Fetch new Upstream Docker Hub Image Digest") {
       steps {
         script {
           if (REBUILD_IMAGE == false) {
@@ -78,7 +78,7 @@ pipeline {
       }
     }
     
-    stage('Determine if it has been more than 2 weeks since the latest build') {
+    stage("Determine if it has been more than 2 weeks since the latest build") {
       steps {
         script {
           if (REBUILD_IMAGE == false) {
@@ -118,13 +118,13 @@ pipeline {
       }
     }
     
-    stage('Build') {
+    stage("Build") {
       steps {
-        sh 'docker build -t ${DOCKERHUB_USER_NAME}/${DOCKERHUB_REPO_NAME}:${DOCKERHUB_REPO_TAG} .'
+        sh 'docker build -t ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}:${DOCKERHUB_REPO_TAG} .'
       }
     }
        
-    stage('Push image to Docker Hub') {
+    stage("Push image to Docker Hub") {
       steps {
         sh 'docker push ${DOCKERHUB_USER_NAME}/${DOCKERHUB_REPO_NAME}:${DOCKERHUB_REPO_TAG}'
       }
