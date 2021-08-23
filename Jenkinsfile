@@ -49,7 +49,7 @@ pipeline {
     
     stage('Fetch new Upstream Docker Hub Image Digest') {
       steps {
-        if (REBUILD_IMAGE = false) {
+        if (REBUILD_IMAGE == false) {
           script {
             NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
               script: '''
@@ -74,7 +74,7 @@ pipeline {
     
     stage('Determine if it has been more than 2 weeks since the latest build') {
       steps {
-        if (REBUILD_IMAGE = false) {
+        if (REBUILD_IMAGE == false) {
           script {
            SECONDS_SINCE_LAST_IMAGE = sh(
               script: '''
