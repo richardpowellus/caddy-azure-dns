@@ -7,4 +7,8 @@ RUN xcaddy build \
 
 FROM caddy
 
+RUN apk update && \
+    apk upgrade && \
+    rm -rf /var/cache/apk/*
+
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
