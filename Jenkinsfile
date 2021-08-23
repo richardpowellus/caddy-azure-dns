@@ -126,7 +126,7 @@ pipeline {
        
     stage("Push image to Docker Hub") {
       steps {
-        sh 'docker push ${DOCKERHUB_USER_NAME}/${DOCKERHUB_REPO_NAME}:${DOCKERHUB_REPO_TAG}'
+        sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}:${DOCKERHUB_REPO_TAG}'
       }
     }
     
