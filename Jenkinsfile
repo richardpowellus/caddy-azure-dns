@@ -91,10 +91,10 @@ pipeline {
             SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
             echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
             if (SECONDS_SINCE_LAST_IMAGE_INT > MAXIMUM_IMAGE_AGE_SECONDS) {
-              echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
+              echo("Image is too old. Image will be rebuilt.")
               REBUILD_IMAGE = true
             } else {
-              echo("Image is newer than 2 weeks. This will NOT cause an image rebuild.")
+              echo("Image is NOT too old. This will NOT cause an image rebuild.")
             }
           } else {
             echo("Image is already marked for build. Skipping this stage.")
