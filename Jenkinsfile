@@ -17,7 +17,7 @@ pipeline {
     DOCKERHUB_REPO_NAME = "caddy-azure-dns"
     DOCKERHUB_REPO_TAG = "latest"
     JQ_DESCRIPTOR_QUERY_STRING = ".[].Descriptor | select (.platform.architecture==\"amd64\" and .platform.os==\"linux\")"
-    MAXIMUM_IMAGE_AGE_SECONDS = 604800 // 1 week
+    MAXIMUM_IMAGE_AGE_SECONDS = "604800" // 1 week
   }
   
   stages {
@@ -89,8 +89,10 @@ pipeline {
               returnStdout: true
             ).trim()
             SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
+            MAXIMUM_IMAGE_AGE_SECONDS_INT = MAXIMUM_IMAGE_AGE_SECONDS.toInteger()
             echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
-            if (SECONDS_SINCE_LAST_IMAGE_INT > MAXIMUM_IMAGE_AGE_SECONDS) {
+            echo("MAXIMUM_IMAGE_AGE_SECONDS_INT: '${MAXIMUM_IMAGE_AGE_SECONDS_INT}'")
+            if (SECONDS_SINCE_LAST_IMAGE_INT > MAXIMUM_IMAGE_AGE_SECONDS_INT) {
               echo("Image is too old. Image will be rebuilt.")
               REBUILD_IMAGE = true
             } else {
