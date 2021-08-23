@@ -65,9 +65,9 @@ pipeline {
             } else {
               echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
             }
+          } else {
+            echo("Image is already marked for build. Skipping this stage.")
           }
-        } else {
-          echo("Image is already marked for build. Skipping this stage.")
         }
       }
     }
