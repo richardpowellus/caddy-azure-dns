@@ -16,6 +16,8 @@ pipeline {
     DOCKERHUB_USERNAME = "dprus"
     DOCKERHUB_REPO_NAME = "caddy-azure-dns"
     DOCKERHUB_REPO_TAG = "latest"
+    JQ_DESCRIPTOR_QUERY_STRING = ".[].Descriptor | select (.platform.architecture==\"amd64\" and .platform.os==\"linux\")"
+    MAXIMUM_IMAGE_AGE_SECONDS = 604800 // 1 week
   }
   
   stages {
@@ -58,7 +60,7 @@ pipeline {
         script {
           NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
             script: '''
-              docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq '.[].Descriptor | select (.platform.architecture=="amd64" and .platform.os=="linux")' | jq -r '.digest'
+              docker manifest inspect ${UPSTREAM_IMAGE_NAME} -v | jq "${JQ_DESCRIPTOR_QUERY_STRING}" | jq -r '.digest'
             ''',
             returnStdout: true
           ).trim()
@@ -74,7 +76,7 @@ pipeline {
       }
     }
     
-    stage("Determine if it has been more than 2 weeks since the latest build") {
+    stage("Determine if it has been more than ${MAXIMUM_IMAGE_AGE_SECONDS} since the latest build") {
       steps {
         script {
           if (REBUILD_IMAGE == "false") {
@@ -88,7 +90,7 @@ pipeline {
             ).trim()
             SECONDS_SINCE_LAST_IMAGE_INT = SECONDS_SINCE_LAST_IMAGE.toInteger()
             echo("SECONDS_SINCE_LAST_IMAGE_INT: '${SECONDS_SINCE_LAST_IMAGE_INT}'")
-            if (SECONDS_SINCE_LAST_IMAGE_INT > 1209600) { // 1209600 is 2 weeks in seconds
+            if (SECONDS_SINCE_LAST_IMAGE_INT > MAXIMUM_IMAGE_AGE_SECONDS) {
               echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
               REBUILD_IMAGE = true
             } else {
