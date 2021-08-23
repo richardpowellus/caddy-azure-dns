@@ -55,7 +55,7 @@ pipeline {
       }
     }
     
-    stage("Fetch new Upstream Docker Hub Image Digest") {
+    stage("Fetch new Upstream Docker Hub image Digest") {
       steps {
         script {
           NEW_UPSTREAM_DOCKERHUB_IMAGE_DIGEST = sh(
@@ -70,13 +70,13 @@ pipeline {
             echo("Upstream Docker Hub image digests are not equal. Image will be rebuilt.")
             REBUILD_IMAGE = true
           } else {
-            echo("Upstream Docker Hub image digests are equal. This will not cause an image rebuild.")
+            echo("Upstream Docker Hub image digests are equal. This will NOT cause an image rebuild.")
           }
         }
       }
     }
     
-    stage("Determine if it has been more than ${MAXIMUM_IMAGE_AGE_SECONDS} since the latest build") {
+    stage("Determine if the image is too old and should be rebuit anyway") {
       steps {
         script {
           if (REBUILD_IMAGE == "false") {
@@ -94,7 +94,7 @@ pipeline {
               echo("It has been more than 2 weeks since the last build. Image will be rebuilt.")
               REBUILD_IMAGE = true
             } else {
-              echo("Image is newer than 2 weeks. This will not cause an image rebuild.")
+              echo("Image is newer than 2 weeks. This will NOT cause an image rebuild.")
             }
           } else {
             echo("Image is already marked for build. Skipping this stage.")
