@@ -77,7 +77,7 @@ pipeline {
     stage("Determine if it has been more than 2 weeks since the latest build") {
       steps {
         script {
-          if (REBUILD_IMAGE == false) {
+          if (REBUILD_IMAGE == "false") {
             SECONDS_SINCE_LAST_IMAGE = sh(
               script: '''
                 d1=$(curl -s GET https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}/tags/${DOCKERHUB_REPO_TAG} | jq -r ".last_updated")
