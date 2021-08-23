@@ -33,18 +33,24 @@ pipeline {
       }
     }
     
-    stage('Login to Docker Hub') {
+    stage("Login to Docker Hub") {
       steps {
         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
       }
     }
     
-    if(currentBuild.changeSets.size() > 0) {
-      echo("There are changes in the git repository since the last build. Image will be rebuilt.")
-      REBUILD_IMAGE = true
-    }
-    else {
-      echo("There are NO changes in the git repository since the last build. This will not trigger an image rebuild.")
+    stage("Check for git repository changes") {
+      steps {
+        script {
+          if(currentBuild.changeSets.size() > 0) {
+            echo("There are changes in the git repository since the last build. Image will be rebuilt.")
+            REBUILD_IMAGE = true
+          }
+          else {
+            echo("There are NO changes in the git repository since the last build. This will not trigger an image rebuild.")
+          }
+        }
+      }
     }
     
     stage('Fetch new Upstream Docker Hub Image Digest') {
