@@ -14,7 +14,7 @@ pipeline {
     REBUILD_IMAGE = false
     UPSTREAM_IMAGE_NAME = "caddy:builder"
     DOCKERHUB_USERNAME = "dprus"
-    DOCKERHUB_REPO_NAME = "caddy-azure-dns"
+    DOCKERHUB_REPO_NAME = "caddy-security"
     DOCKERHUB_REPO_TAG = "latest"
     JQ_DESCRIPTOR_QUERY_STRING = ".[].Descriptor | select (.platform.architecture==\"amd64\" and .platform.os==\"linux\")"
     MAXIMUM_IMAGE_AGE_SECONDS = "604800" // 1 week
