@@ -1,4 +1,4 @@
-FROM caddy:builder AS builder
+FROM caddy:builder-alpine AS builder
 
 RUN xcaddy build \
     --with github.com/greenpau/caddy-security
