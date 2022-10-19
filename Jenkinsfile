@@ -93,6 +93,7 @@ pipeline {
             SECONDS_SINCE_LAST_IMAGE = sh(
               script: '''
                 d1=$(curl -s GET https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO_NAME}/tags/${DOCKERHUB_REPO_TAG} | jq -r ".last_updated")
+                if [ $d1 == null ]; then d1=0; fi
                 ddiff=$(( $(date "+%s") - $(date -d "$d1" "+%s") ))
                 echo $ddiff
               ''',
